@@ -762,6 +762,10 @@ public class PluginGenerator {
 
             // Check to see if the config has changed
             writeFile = hasConfigChanged(output);
+            Tr.debug(tc, "writeFile : " + writeFile);
+            Tr.debug(tc, "utilityRequest : " + utilityRequest);
+
+
 
             // Only write out to file if we have new or changed configuration information, or if this is an explicit request
             if (writeFile || !utilityRequest || !fileExists) {
@@ -769,8 +773,11 @@ public class PluginGenerator {
                 // If writeFile is false and the cachedFile doesn't exist write to the cache file and copy from there
                 // If writeFile is false and cachedFile exists copy from there
                 // If writeFile is false and cachedFile doesn't exist write to cachedFile and copy from there
+                
                 try {
                     if (!cachedFile.exists() || writeFile) {
+                        Tr.debug(tc, "cachedFile : " + cachedFile.exists());
+
                         fOutputStream = new FileOutputStream(cachedFile);
                         pluginCfgWriter = new BufferedWriter(new OutputStreamWriter(fOutputStream, "ISO-8859-1"));
 
@@ -795,6 +802,7 @@ public class PluginGenerator {
                         // Ensure data is physically written to disk
                         fOutputStream.getFD().sync();
                         pluginCfgWriter.close();
+                        Tr.debug(tc, "cachedFile : " + cachedFile.exists());
                     }
                     copyFile(cachedFile, outFile.asFile());
                 }
