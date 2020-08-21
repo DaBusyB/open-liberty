@@ -34,8 +34,8 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTable;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
@@ -69,6 +69,7 @@ public class JSF23CDIGeneralTests {
     @BeforeClass
     public static void setup() throws Exception {
         ShrinkHelper.defaultDropinApp(jsf23CDIServer, "PostRenderViewEvent.war", "com.ibm.ws.jsf23.fat.postrenderview.events");
+        ShrinkHelper.defaultDropinApp(jsf23CDIServer, "HelloWorld.war", "");
         ShrinkHelper.defaultDropinApp(jsf23CDIServer, "CDIManagedProperty.war", "com.ibm.ws.jsf23.fat.cdi.managedproperty");
         ShrinkHelper.defaultDropinApp(jsf23CDIServer, "ELImplicitObjectsViaCDI.war", "com.ibm.ws.jsf23.fat.elimplicit.cdi.beans");
         ShrinkHelper.defaultDropinApp(jsf23CDIServer, "JSF23Spec1300.war", "com.ibm.ws.jsf23.fat.spec1300");
@@ -1256,6 +1257,27 @@ public class JSF23CDIGeneralTests {
 
             assertTrue("The IBMViewHandler was not used.",
                        !jsf23CDIServer.findStringsInTrace("set ViewHandler =.*IBMViewHandler").isEmpty());
+        }
+    }
+
+    @Test
+    public void testHelloWorld() throws Exception {
+        try (WebClient webClient = new WebClient()) {
+
+            // Construct the URL for the test
+            String contextRoot = "HelloWorld";
+            URL url = JSFUtils.createHttpUrl(jsf23CDIServer, contextRoot, "index.xhtml");
+
+            HtmlPage page = (HtmlPage) webClient.getPage(url);
+
+            String responseText = page.asText();
+
+            // Log the page for debugging if necessary in the future.
+            Log.info(c, name.getMethodName(), responseText);
+            Log.info(c, name.getMethodName(), page.asXml());
+
+            assertTrue("Page does not contain expected response.", responseText.contains("Hello World"));
+            assertTrue("Page does not contain expected response.", responseText.contains("CDI Integration Test"));
         }
     }
 }
